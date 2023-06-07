@@ -1,5 +1,7 @@
 package query
 
+// Init database:
+
 const CREATE_TABLE_MODALITIES = `
 
 	CREATE TABLE IF NOT EXISTS public.modalities (
@@ -37,4 +39,16 @@ const CREATE_TABLE_PAYMENT = `CREATE TABLE IF NOT EXISTS public.payment (
 	payment_status BOOLEAN,
 	study_id INTEGER NOT NULL,
 	FOREIGN KEY (study_id) REFERENCES study (id)
-)`
+);`
+
+// Modalities query:
+
+const INSERT_MODALITY = `INSERT INTO public.modalities (name) VALUES ($1);`
+
+const SELECT_ALL_MODALITIES = `SELECT id, name FROM public.modalities;`
+
+const SELECT_MODALITY_BY_ID = `SELECT name FROM public.modalities WHERE id = $1;`
+
+const UPDATE_MODALITY = `UPDATE public.modalities SET name=$1 WHERE id = $2;`
+
+const DELETE_MODALITY = `DELETE FROM public.modalities WHERE id=$1`
