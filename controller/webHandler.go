@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/GustavoFreitas22/ludus_sys/model"
@@ -18,13 +19,13 @@ func Init() {
 
 	{
 
-		api.GET("/modality/all", func(ctx *gin.Context) {
-			allModalities := repository.FindAllModalities()
+		api.GET("/product/all", func(ctx *gin.Context) {
+			allProducts := repository.FindAllProducts()
 
-			ctx.JSON(200, allModalities)
+			ctx.JSON(200, allProducts)
 		})
 
-		api.GET("/modality/:id", func(ctx *gin.Context) {
+		api.GET("/product/:id", func(ctx *gin.Context) {
 
 			param := ctx.Param("id")
 
@@ -34,68 +35,75 @@ func Init() {
 				return
 			}
 
-			modality := repository.FindModalityById(id)
+			product := repository.FindProductById(id)
 
-			ctx.JSON(200, modality.Name)
+			ctx.JSON(200, product.Name)
 		})
 
-		api.POST("/modality/", func(ctx *gin.Context) {
-			var newModality model.Modality
+		api.GET("/product/name/:name", func(ctx *gin.Context) {
 
-			ctx.BindJSON(&newModality)
+			name := ctx.Param("name")
 
-			validName := service.ValidateNewModality(newModality.Name)
+			fmt.Println(name)
+
+			product := repository.FindProductByName(name)
+
+			ctx.JSON(200, product)
+		})
+
+		api.POST("/product/", func(ctx *gin.Context) {
+			var newProduct model.Product
+
+			ctx.BindJSON(&newProduct)
+
+			validName := service.ValidateIfExist(newProduct.Name)
 
 			if !validName {
-				ctx.JSON(400, "not created")
+				ctx.JSON(400, "not created, product aready exist")
 				return
 			}
 
 			ctx.JSON(201, "created with success")
 		})
 
-		api.PUT("/modality/:id/:name", func(ctx *gin.Context) {
+		api.PUT("/product/:id/:name", func(ctx *gin.Context) {
 			idParam := ctx.Param("id")
-			name := ctx.Param("name")
+
+			var updatedDataProduct model.Product
+			ctx.BindJSON(&updatedDataProduct)
 
 			id, err := strconv.Atoi(idParam)
 			if err != nil {
-				ctx.JSON(402, "BAD REQUEST")
+				ctx.JSON(402, "Invalid id")
 				return
 			}
 
-			validName := service.ValidateEditModality(name)
+			validName := service.ValidateIfExist(updatedDataProduct.Name)
 
 			if !validName {
-				ctx.JSON(400, "Name already exist in database")
+				ctx.JSON(400, "Product with this name already exist in database")
 				return
 			}
 
-			repository.UpdateModality(id, name)
+			repository.UpdateProduct(id, updatedDataProduct)
 
 			ctx.JSON(200, "Edited")
 		})
 
-		api.DELETE("/modality/:id", func(ctx *gin.Context) {
+		api.DELETE("/product/:id", func(ctx *gin.Context) {
 			idParam := ctx.Param("id")
 
 			id, err := strconv.Atoi(idParam)
 			if err != nil {
-				ctx.JSON(402, "BAD REQUEST")
+				ctx.JSON(402, "Invalid Id")
 				return
 			}
 
-			repository.DeleteModality(id)
+			repository.DeleteProduct(id)
 
 			ctx.JSON(200, "Deleted")
 		})
 
-	}
-
-	{
-		api.GET("/fala", func(ctx *gin.Context) {
-			ctx.JSON(200, "testando e funcioanando")
-		})
 	}
 
 	router.Run(":8080")

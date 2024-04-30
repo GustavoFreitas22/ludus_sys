@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	config.CreateConnection()
+	config.InitDatabase()
 	controller.Init()
 }
