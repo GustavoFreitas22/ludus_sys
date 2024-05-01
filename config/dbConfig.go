@@ -14,7 +14,7 @@ func InitDatabase() {
 		panic("failed to connect database")
 	}
 
-	err = result.AutoMigrate(&model.Product{})
+	err = result.AutoMigrate(&model.Product{}, &model.Storage{})
 	if err != nil {
 		panic("failed to start database")
 	}

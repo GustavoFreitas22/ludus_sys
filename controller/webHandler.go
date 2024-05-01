@@ -18,7 +18,7 @@ func Init() {
 	api := router.Group("/api")
 
 	{
-
+		// Product endpoints
 		api.GET("/product/all", func(ctx *gin.Context) {
 			allProducts := repository.FindAllProducts()
 
@@ -104,6 +104,52 @@ func Init() {
 			ctx.JSON(200, "Deleted")
 		})
 
+		// storage endpoints
+		api.GET("/storage/all/:id", func(ctx *gin.Context) {
+			idParam := ctx.Param("id")
+
+			id, err := strconv.Atoi(idParam)
+			if err != nil {
+				ctx.JSON(402, "Invalid Id")
+				return
+			}
+
+			allProducts := repository.ListStorageItems(id)
+
+			ctx.JSON(200, allProducts)
+		})
+
+		api.DELETE("/storage/:id", func(ctx *gin.Context) {
+			idParam := ctx.Param("id")
+
+			id, err := strconv.Atoi(idParam)
+			if err != nil {
+				ctx.JSON(402, "Invalid Id")
+				return
+			}
+
+			repository.DeleteStorage(id)
+
+			ctx.JSON(200, "Deleted")
+		})
+
+		api.PUT("/storage/:id", func(ctx *gin.Context) {
+			idParam := ctx.Param("id")
+
+			var updatedDataStorage model.Storage
+			ctx.BindJSON(&updatedDataStorage)
+
+			id, err := strconv.Atoi(idParam)
+			if err != nil {
+				ctx.JSON(402, "Invalid id")
+				return
+			}
+
+			storageWithValidItems := service.ValidateIfItemExistInStorage(updatedDataStorage.Items, id)
+
+			repository.UpdateStorageItems(storageWithValidItems, id)
+			ctx.JSON(200, "Updated")
+		})
 	}
 
 	router.Run(":8080")

@@ -8,12 +8,7 @@ import (
 )
 
 func CreateNewProduct(product model.Product) {
-
-	product = model.Product{Name: "teste"}
-
 	config.Datasource.Create(&product)
-
-	log.Println("Rows affects: ", product.Name)
 }
 
 func FindProductByName(name string) model.Product {
